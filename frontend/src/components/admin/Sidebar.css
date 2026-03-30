@@ -1,0 +1,12 @@
+@reference "tailwindcss";
+
+.sideElement{
+    @apply p-3 rounded-xl cursor-pointer;
+}
+.sideElement:hover{
+    @apply bg-gray-50
+}
+
+.active{
+    @apply font-semibold bg-gray-100;
+}
