@@ -1,0 +1,6 @@
+@reference "tailwindcss";
+
+
+.dashboardBox{
+    @apply border border-blue-100  rounded-xl bg-white;
+}
