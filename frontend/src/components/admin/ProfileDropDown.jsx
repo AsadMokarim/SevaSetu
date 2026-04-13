@@ -15,7 +15,7 @@ export default function ProfileDropDown() {
         setAnchorEl(null);
     };
     return (
-        <div className='pl-8 -mr-8'>
+        <div className='pl-8 -mr-8 transition delay-100 duration-250 ease-in-out'>
             <IconButton onClick={handleClick}>
                 <Avatar src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e" />
                 <ArrowDropDownIcon color='action' />
