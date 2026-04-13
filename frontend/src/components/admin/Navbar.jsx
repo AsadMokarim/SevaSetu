@@ -56,8 +56,8 @@ export default function Navbar({ navTitle = "Task Assignement" }) {
                             </div>
                         </div>
                         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                            <button aria-describedby={id} variant="contained" onClick={handleClick} className='hover:bg-green-50 rounded-xl p-1'>
-                                <Badge badgeContent={4} color="success">
+                            <button aria-describedby={id} variant="contained" onClick={handleClick} className='transition delay-100 duration-200 ease-in-out hover:bg-green-50 rounded-xl p-1'>
+                                <Badge badgeContent={4} color="primary">
                                     <NotificationsNoneIcon color="action" />
                                 </Badge>
                             </button>
