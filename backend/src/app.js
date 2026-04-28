@@ -54,6 +54,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/volunteers', volunteerRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/fcm', fcmRoutes);
+app.use('/api/debug', require('./routes/debugRoutes'));
 
 
 

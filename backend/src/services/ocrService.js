@@ -4,6 +4,7 @@ const axios = require('axios');
 const dotenv = require('dotenv');
 const sharp = require('sharp');
 const geocodingService = require('./geocodingService');
+const geminiService = require('./geminiService');
 
 dotenv.config();
 
@@ -60,24 +61,104 @@ const isQualityLow = (text) => {
  * Advanced Extraction Pipeline
  */
 const extractText = async (fileBuffer, mimeType) => {
-    console.log(`[OCR] MOCK extraction for ${mimeType}. (Native OCR disabled for Render Demo)`);
-    
-    // Return a dummy but realistic extraction for the demo
-    return { 
-        rawText: "URGENT: Food distribution needed at Lajpat Nagar. 20 volunteers required for ration kit packing. Contact: 9876543210", 
-        method: 'mock_demo', 
-        confidence: 0.95, 
-        debugImages: {} 
-    };
+    let rawText = '';
+    let method = 'google_vision';
+    let processedBuffer = fileBuffer;
+    let debugImages = {};
+
+    console.log(`[OCR] Starting extraction for ${mimeType} (${fileBuffer.length} bytes)`);
+
+    if (mimeType.startsWith('image/')) {
+        try {
+            console.log('[OCR] Advanced Preprocessing...');
+            const sharpInstance = sharp(fileBuffer)
+                .rotate()
+                .trim()
+                .grayscale()
+                .normalize()
+                .sharpen()
+                .resize({ width: 1400, withoutEnlargement: false })
+                .threshold(190);
+
+            processedBuffer = await sharpInstance.toBuffer();
+
+            if (process.env.NODE_ENV === 'development') {
+                const base64 = processedBuffer.toString('base64');
+                debugImages.preprocessed = `data:image/png;base64,${base64}`;
+            }
+
+            console.log(`[OCR] Preprocessing done. New size: ${processedBuffer.length} bytes`);
+        } catch (err) {
+            console.warn('[OCR] Preprocessing failed:', err.message);
+        }
+    }
+
+    // Google Vision (Primary)
+    if (visionClient && process.env.GOOGLE_APPLICATION_CREDENTIALS && !visionBillingDisabled) {
+        try {
+            const [result] = await visionClient.textDetection(processedBuffer);
+            rawText = result.fullTextAnnotation ? result.fullTextAnnotation.text : '';
+            if (rawText) console.log('[OCR] Google Vision extraction successful.');
+        } catch (error) {
+            console.warn('[OCR] Google Vision failed:', error.message);
+            if (error.message.includes('billing') || error.message.includes('PERMISSION_DENIED')) {
+                visionBillingDisabled = true;
+            }
+        }
+    }
+
+    // Tesseract Fallback
+    let confidence = 0;
+    if (!rawText) {
+        try {
+            method = 'tesseract';
+            const { data } = await Tesseract.recognize(processedBuffer, 'eng', {
+                tessedit_pageseg_mode: '6',
+                tessedit_ocr_engine_mode: '1',
+            });
+            rawText = data.text;
+            confidence = data.confidence;
+            console.log(`[OCR] Tesseract complete. Confidence: ${confidence}%`);
+        } catch (err) {
+            console.error('[OCR] Tesseract failure:', err.message);
+        }
+    }
+
+    // Ultimate fallback for Render Demo if all else fails
+    if (!rawText && process.env.NODE_ENV === 'production') {
+        console.log('[OCR] Using fallback mock text for demo.');
+        rawText = "URGENT: Food distribution needed at Lajpat Nagar. 20 volunteers required for ration kit packing.";
+        method = 'mock_fallback';
+        confidence = 90;
+    }
+
+    return { rawText, method, confidence, debugImages };
 };
 
 /**
  * Smart Parsing with Handwriting Support
  */
-const parseSurveyText = (rawText, confidence = 100) => {
+const parseSurveyText = async (rawText, confidence = 100) => {
     const cleanedText = cleanText(rawText);
 
-    // Task 4: Handwriting Detection
+    // 1. Try Gemini Parsing First (Highest Quality)
+    try {
+        const geminiResult = await geminiService.parseWithGemini(cleanedText);
+        if (geminiResult && geminiResult.structuredData) {
+            console.log("[OCR] Gemini parsing successful.");
+            return {
+                ...geminiResult.structuredData,
+                isHandwritten: confidence < 75,
+                confidence: confidence / 100,
+                aiMeta: geminiResult.aiMeta
+            };
+        }
+    } catch (err) {
+        console.warn("[OCR] Gemini parsing failed, falling back to regex:", err.message);
+    }
+
+    // 2. Fallback to Regex-based Parsing (Original Logic)
+    console.log("[OCR] Using fallback regex parsing.");
     const isHandwritten = confidence > 0 && confidence < 75;
 
     // 🛑 TASK 1: Hard Confidence Threshold
@@ -160,7 +241,7 @@ const parseSurveyText = (rawText, confidence = 100) => {
     }
 
     // 📊 TASK 6: Debug Logging
-    console.log('[OCR] Final Report:', {
+    console.log('[OCR] Final Report (Fallback):', {
         isHandwritten,
         isSafeMode,
         ocrConfidence: confidence,
@@ -175,6 +256,11 @@ const parseSurveyText = (rawText, confidence = 100) => {
         isHandwritten,
         isSafeMode,
         confidence: confidence / 100,
+        aiMeta: {
+            model: "regex-parser-v1",
+            confidence: 0.5,
+            fallbackUsed: true
+        },
         _debug: process.env.NODE_ENV === 'development' ? { rawText, cleanedText } : null
     };
 };

@@ -168,8 +168,8 @@ const extractFromFile = async (req, res) => {
             return res.status(422).json({ success: false, message: 'Could not extract any text from the file' });
         }
 
-        // 2. Parse Text
-        const extractedData = ocrService.parseSurveyText(rawText, confidence);
+        // 2. Parse Text (now async with Gemini support)
+        const extractedData = await ocrService.parseSurveyText(rawText, confidence);
 
         if (extractedData.error === 'LOW_OCR_QUALITY') {
             return res.status(422).json({
@@ -188,15 +188,21 @@ const extractFromFile = async (req, res) => {
         }
 
         const result = {
-            ...extractedData,
-            lat: geoData ? geoData.lat : null,
-            lng: geoData ? geoData.lng : null,
-            formattedAddress: geoData ? geoData.formattedAddress : extractedData.location,
-            geocodingConfidence: geoData ? geoData.confidence : 0,
-            geocodingProvider: geoData ? geoData.provider : 'none',
-            extractionMethod: method,
-            rawText: rawText.slice(0, 1000) // For debugging
+            rawText: rawText.slice(0, 1000), // OCR output
+            structuredData: {
+                ...extractedData,
+                lat: geoData ? geoData.lat : null,
+                lng: geoData ? geoData.lng : null,
+                formattedAddress: geoData ? geoData.formattedAddress : extractedData.location,
+                geocodingConfidence: geoData ? geoData.confidence : 0,
+                geocodingProvider: geoData ? geoData.provider : 'none',
+                extractionMethod: method,
+            },
+            aiMeta: extractedData.aiMeta
         };
+
+        // Remove duplicated aiMeta from structuredData if present
+        delete result.structuredData.aiMeta;
 
         res.status(200).json({
             success: true,
