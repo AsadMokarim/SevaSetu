@@ -9,7 +9,7 @@ import Popover from '@mui/material/Popover';
 import NotificationPanel from './NotifcationPanel.jsx';
 
 
-export default function Navbar({ navTitle = "Task Assignement" }) {
+export default function Navbar({ navTitle = "Dashboard" }) {
 
     
     const [anchorEl, setAnchorEl] = React.useState(null);
