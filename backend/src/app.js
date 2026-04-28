@@ -18,27 +18,8 @@ dotenv.config();
 const app = express();
 
 // Middleware
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  // In production, you would add your actual domain here, or inject via ENV
-  process.env.FRONTEND_URL 
-].filter(Boolean);
-
 app.use(cors({
-  origin: function (origin, callback) {
-    console.log("[CORS] Request origin:", origin); // Bonus: Debugging log
-    if (
-      !origin ||
-      allowedOrigins.includes(origin) ||
-      origin.startsWith('http://192.168.') || // ✅ allow mobile on same WiFi
-      origin.startsWith('http://10.')         // ✅ support other private networks
-    ) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS blocked for origin: ${origin}`));
-    }
-  },
+  origin: "*",
   credentials: true
 }));
 app.use(express.json());
@@ -61,7 +42,7 @@ app.get('/health', (req, res) => {
         message: 'SevaSetu Backend is running',
         data: {
             timestamp: new Date().toISOString(),
-            env: process.env.NODE_ENV || 'development'
+            env: process.env.NODE_ENV || 'production'
         }
     });
 });

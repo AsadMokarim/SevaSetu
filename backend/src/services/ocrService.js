@@ -60,71 +60,15 @@ const isQualityLow = (text) => {
  * Advanced Extraction Pipeline
  */
 const extractText = async (fileBuffer, mimeType) => {
-    let rawText = '';
-    let method = 'google_vision';
-    let processedBuffer = fileBuffer;
-    let debugImages = {};
-
-    console.log(`[OCR] Starting extraction for ${mimeType} (${fileBuffer.length} bytes)`);
-
-    if (mimeType.startsWith('image/')) {
-        try {
-            console.log('[OCR] Advanced Preprocessing...');
-            // Task 1, 2, 3: Rotate, Crop (trim), Normalize, Sharpen, Resize, Threshold
-            const sharpInstance = sharp(fileBuffer)
-                .rotate() // Task 1: EXIF rotation
-                .trim()   // Task 2: Auto-crop margins
-                .grayscale()
-                .normalize() // Task 3
-                .sharpen()
-                .resize({ width: 1400, withoutEnlargement: false })
-                .threshold(190); // Task 3: Stronger binarization
-
-            processedBuffer = await sharpInstance.toBuffer();
-
-            // Task 8: Debug Visualization
-            if (process.env.NODE_ENV === 'development') {
-                const base64 = processedBuffer.toString('base64');
-                debugImages.preprocessed = `data:image/png;base64,${base64}`;
-            }
-
-            console.log(`[OCR] Preprocessing done. New size: ${processedBuffer.length} bytes`);
-        } catch (err) {
-            console.warn('[OCR] Preprocessing failed:', err.message);
-        }
-    }
-
-    // Google Vision
-    if (visionClient && process.env.GOOGLE_APPLICATION_CREDENTIALS && !visionBillingDisabled) {
-        try {
-            const [result] = await visionClient.textDetection(processedBuffer);
-            rawText = result.fullTextAnnotation ? result.fullTextAnnotation.text : '';
-        } catch (error) {
-            if (error.message.includes('billing') || error.message.includes('PERMISSION_DENIED')) {
-                console.error('[OCR] Google Vision billing disabled.');
-                visionBillingDisabled = true;
-            }
-        }
-    }
-
-    // Tesseract Fallback
-    let confidence = 0;
-    if (!rawText) {
-        try {
-            method = 'tesseract';
-            const { data } = await Tesseract.recognize(processedBuffer, 'eng', {
-                tessedit_pageseg_mode: '6',
-                tessedit_ocr_engine_mode: '1',
-            });
-            rawText = data.text;
-            confidence = data.confidence;
-            console.log(`[OCR] Tesseract complete. Confidence: ${confidence}%`);
-        } catch (err) {
-            console.error('[OCR] Tesseract failure:', err.message);
-        }
-    }
-
-    return { rawText, method, confidence, debugImages };
+    console.log(`[OCR] MOCK extraction for ${mimeType}. (Native OCR disabled for Render Demo)`);
+    
+    // Return a dummy but realistic extraction for the demo
+    return { 
+        rawText: "URGENT: Food distribution needed at Lajpat Nagar. 20 volunteers required for ration kit packing. Contact: 9876543210", 
+        method: 'mock_demo', 
+        confidence: 0.95, 
+        debugImages: {} 
+    };
 };
 
 /**
