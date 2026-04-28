@@ -83,7 +83,7 @@ export default function UnassignedTask({ dueTask }) {
         return `${days} days overdue`
     }
     return (
-        <div className="w-120 p-4 dashboardBox">
+        <div className="w-116 p-4 dashboardBox">
             <h3 className="font-semibold mb-4 text-lg">Unassigned Tasks</h3>
             <ul className='overflow-y-auto max-h-50'>
                 {

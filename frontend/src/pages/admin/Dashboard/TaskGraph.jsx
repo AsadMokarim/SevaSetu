@@ -11,7 +11,7 @@ export default function TaskGraph() {
         { month: "Mar", created: 80, closed: 72 },
     ];
     return (
-        <div className='w-120 h-68 p-4 dashboardBox'>
+        <div className='flex-1 h-68 p-4 dashboardBox'>
             <h3 className="font-semibold mb-4">Created Vs Closed tasks for last 6 months</h3>
             <LineChart height={220} data={taskData} style={{ width: '100%', aspectRatio: 1.618, maxWidth: 600 }} responsive className="focus:outline-none -ml-4">
                 <CartesianGrid strokeDasharray="3 3" />
