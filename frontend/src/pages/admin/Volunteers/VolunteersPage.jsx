@@ -1,83 +1,156 @@
-import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
-import ConstructionIcon from '@mui/icons-material/Construction';
-import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
-import Panel from './PanelBox';
+import React, { useState, useEffect } from "react";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import BarChartIcon from "@mui/icons-material/BarChart";
 
-import { v4 as uuidv4 } from "uuid";
+import VolunteerStatCard from "./VolunteerStatCard";
+import VolunteerFilterBar from "./VolunteerFilterBar";
+import VolunteerGrid from "./VolunteerGrid";
+import { VolunteerFormDialog, DeleteVolunteerDialog } from "./VolunteerDialogs";
+import ViewVolunteerDialog from "./ViewVolunteerDialog";
+import { getVolunteers, updateVolunteer } from "../../../api/volunteerApi";
+import { useError } from "../../../contexts/ErrorContext";
 
+// Removed SAMPLE_VOLUNTEERS to use real Firestore data exclusively.
 
+export default function VolunteerPage() {
+  const { showError } = useError();
+  const [volunteers, setVolunteers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Filter state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({ skill: "All Skills", avail: "All", sort: "Performance" });
 
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
+  
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteData, setDeleteData] = useState(null);
 
-import ProfileCard from './ProfileCard';
-import SearchFilters from './SearchFilters';
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [viewData, setViewData] = useState(null);
 
-
-export default function Volunteers({ volunteerData }) {
-  volunteerData = [
-    {
-      name: "Asad Mokarim",
-      skills: ["coding", "editing", "education"],
-      age: 19,
-      historyOfTask: ["2992", "292993"],
-      languages: ["english", "hindi"],
-      available: true,
-      location: "Aligarh",
-      category: "Technical"
-    },
-    {
-      name: "Harsh Kumar",
-      skills: ["sleep", "clean", "programming", "editing", "coding"],
-      age: 19,
-      historyOfTask: ["2992", "292993","828838"],
-      languages: ["english", "hindi"],
-      available: false,
-      location: "Aligarh",
-      category: "management"
+  const fetchVolunteers = async () => {
+    setLoading(true);
+    try {
+      const data = await getVolunteers();
+      const volunteersList = Array.isArray(data) ? data : (data?.volunteers || []);
+      
+      const mappedData = volunteersList.map(v => ({
+        ...v,
+        id: v.uid || v.id,
+        performanceScore: v.performance_score || 0,
+        tasksCompleted: v.tasks_completed || 0,
+        hoursContributed: v.hours_contributed || 0,
+        available: v.is_available ?? true,
+        avatarColor: v.avatarColor || "blue",
+        badge: (v.performance_score || 0) >= 95 ? "Top Performer" : ((v.performance_score || 0) >= 90 ? "Highly Reliable" : null)
+      }));
+      setVolunteers(mappedData);
+    } catch (e) {
+      showError("Failed to fetch volunteers: " + e.message);
+    } finally {
+      setLoading(false);
     }
-  ]
+  };
 
-  function uniqueSkillCount(volunteerData) {
-    const skills = volunteerData.flatMap(volunteer => volunteer.skills);
-    const uniqueSkill = [...new Set(skills.map(s => s.toLowerCase()))];
-    return uniqueSkill.length;
-  }
-  console.log()
+  useEffect(() => {
+    fetchVolunteers();
+  }, []);
 
-  function availableCount(volunteerData) {
-    let count = 0;
-    for (const volunteer of volunteerData) {
-      if (volunteer.available) {
-        count++;
-      }
+  // Filter Logic
+  const filteredVolunteers = volunteers.filter(v => {
+    // Search
+    if (searchQuery && !v.name?.toLowerCase().includes(searchQuery.toLowerCase()) && !v.email?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    
+    // Skill
+    if (filters.skill !== "All Skills") {
+      if (!v.skills || !v.skills.includes(filters.skill)) return false;
     }
-    return count;
-  }
 
+    // Availability
+    if (filters.avail !== "All") {
+      const isAvail = v.available === true || v.is_available === true;
+      if (filters.avail === "Available" && !isAvail) return false;
+      if (filters.avail === "Unavailable" && isAvail) return false;
+    }
 
+    return true;
+  }).sort((a, b) => {
+    // Sort
+    if (filters.sort === "Name") return (a.name || "").localeCompare(b.name || "");
+    if (filters.sort === "Tasks Completed") return (b.tasksCompleted || b.tasks_completed || 0) - (a.tasksCompleted || a.tasks_completed || 0);
+    if (filters.sort === "Hours Contributed") return (b.hoursContributed || b.hours_contributed || 0) - (a.hoursContributed || a.hours_contributed || 0);
+    // Default Performance
+    return (b.performanceScore || b.performance_score || 0) - (a.performanceScore || a.performance_score || 0);
+  });
+
+  const totalVolunteers = volunteers.length;
+  const availableNow = volunteers.filter((v) => v.available === true || v.is_available === true).length;
+  const topPerformers = volunteers.filter((v) => (v.performanceScore || v.performance_score || 0) >= 90).length;
+  const avgPerformance = totalVolunteers ? Math.round(volunteers.reduce((s, v) => s + (v.performanceScore || v.performance_score || 0), 0) / volunteers.length) : 0;
+
+  const stats = [
+    { head: "Total Volunteers", icon: GroupsOutlinedIcon, number: totalVolunteers, color: "blue" },
+    { head: "Available Now", icon: CheckCircleOutlineIcon, number: availableNow, color: "green" },
+    { head: "Top Performers", icon: AutoAwesomeIcon, number: topPerformers, color: "amber" },
+    { head: "Avg Performance", icon: BarChartIcon, number: avgPerformance, color: "purple" },
+  ];
+
+  const handleToggleVolunteer = async (volunteer) => {
+    try {
+      await updateVolunteer(volunteer.id, { is_available: volunteer.available });
+      await fetchVolunteers();
+    } catch (e) {
+      showError("Failed to update availability: " + e.message);
+    }
+  };
 
   return (
-    <div>
-      <div className="flex gap-8">
-        <Panel heading={`${availableCount(volunteerData)}/${volunteerData.length}`} Icon={PeopleAltOutlinedIcon} subHeading='Available' />
-        <Panel heading={uniqueSkillCount(volunteerData)} Icon={ConstructionIcon} subHeading='Unique Skilled' />
-        <button className='ml-auto'>
-          <Panel heading="Add Volunteer" Icon={PersonAddAlt1Icon} additionalClass="addBtn" />
-        </button>
+    <div className="flex flex-col gap-5 p-5 bg-gray-50 min-h-screen">
+      {/* Stat cards */}
+      <div className="flex gap-4 flex-wrap">
+        {stats.map((s) => <VolunteerStatCard key={s.head} {...s} />)}
       </div>
 
-      <SearchFilters />
+      {/* Filter bar */}
+      <VolunteerFilterBar
+        onAddVolunteer={() => { setEditData(null); setFormDialogOpen(true); }}
+        onSearch={(q) => setSearchQuery(q)}
+        onFilterChange={(f) => setFilters(f)}
+      />
 
+      {/* Grid */}
+      <VolunteerGrid
+        volunteers={filteredVolunteers}
+        onView={(v) => { setViewData(v); setViewDialogOpen(true); }}
+        onEdit={(v) => { setEditData(v); setFormDialogOpen(true); }}
+        onDelete={(v) => { setDeleteData(v); setDeleteDialogOpen(true); }}
+        onToggle={handleToggleVolunteer}
+      />
 
+      {/* Dialogs */}
+      <VolunteerFormDialog
+        open={formDialogOpen}
+        onClose={() => setFormDialogOpen(false)}
+        initialData={editData}
+        onSuccess={fetchVolunteers}
+      />
+      
+      <DeleteVolunteerDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        volunteer={deleteData}
+        onSuccess={fetchVolunteers}
+      />
 
-
-
-
-      <ul className='mt-8 min-h-96  rounded-2xl flex flex-col gap-4'>
-        {volunteerData.map((volunteer) => (
-          <ProfileCard volunteer={volunteer} key={uuidv4()} />
-
-        ))}
-      </ul>
+      <ViewVolunteerDialog 
+        open={viewDialogOpen}
+        onClose={() => setViewDialogOpen(false)}
+        volunteer={viewData}
+      />
     </div>
-  )
+  );
 }
