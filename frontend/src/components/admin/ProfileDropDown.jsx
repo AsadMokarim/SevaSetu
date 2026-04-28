@@ -1,10 +1,10 @@
 import * as React from 'react';
-
 import { Menu, MenuItem, IconButton, Avatar } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-
+import { useAuth } from '../../contexts/AuthContext'; // Relative to src/components/admin/
 
 export default function ProfileDropDown() {
+    const { logout } = useAuth();
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const handleClick = (event) => {
@@ -26,9 +26,9 @@ export default function ProfileDropDown() {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                <MenuItem onClick={handleClose}>Your Profile</MenuItem>
-                <MenuItem onClick={handleClose}>Settings</MenuItem>
-                <MenuItem onClick={handleClose}>Sign out</MenuItem>
+                {/* <MenuItem onClick={handleClose}>Your Profile</MenuItem> */}
+                {/* <MenuItem onClick={handleClose}>Settings</MenuItem> */}
+                <MenuItem onClick={() => { handleClose(); logout(); }}>Sign out</MenuItem>
             </Menu>
         </div>
     )

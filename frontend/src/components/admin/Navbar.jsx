@@ -13,8 +13,9 @@ export default function Navbar({ navTitle = "Dashboard" }) {
 
     
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [unreadCount, setUnreadCount] = React.useState(0);
+
     const handleClick = (event) => {
-        console.log(event)
         setAnchorEl(event.currentTarget);
     };
 
@@ -43,13 +44,11 @@ export default function Navbar({ navTitle = "Dashboard" }) {
                             </button> */}
                         </div>
                         <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                            <div className="flex shrink-0 items-center hidden sm:ml-6 sm:block">
-                                <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Seva Setu" className="h-8 w-auto" />
-                            </div>
+                            
                             <div className="sm:ml-6 sm:block">
                                 <div className="flex space-x-4">
 
-                                    <h3 className=" px-3 py-2 text-sm font-medium">{navTitle}</h3>
+                                    <h3 className=" px-3 py-2 text-xl font-medium">{navTitle}</h3>
 
 
                                 </div>
@@ -57,7 +56,7 @@ export default function Navbar({ navTitle = "Dashboard" }) {
                         </div>
                         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                             <button aria-describedby={id} variant="contained" onClick={handleClick} className='transition delay-100 duration-200 ease-in-out hover:bg-green-50 rounded-xl p-1'>
-                                <Badge badgeContent={4} color="primary">
+                                <Badge badgeContent={unreadCount} color="error">
                                     <NotificationsNoneIcon color="action" />
                                 </Badge>
                             </button>
@@ -72,7 +71,7 @@ export default function Navbar({ navTitle = "Dashboard" }) {
                                 }}
                                 className='rounded mr-3'
                             >
-                               <NotificationPanel />
+                               <NotificationPanel onCountChange={setUnreadCount} />
                             </Popover>
 
                             {/* <!-- Profile dropdown --> */}
