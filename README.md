@@ -83,7 +83,7 @@ Matches are computed based on:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/SevaSetu.git
+   git clone https://github.com/asadmokarim/SevaSetu.git
    cd SevaSetu
    ```
 
