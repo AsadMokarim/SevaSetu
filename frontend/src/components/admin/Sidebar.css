@@ -6,31 +6,37 @@
 }
 
 .sideElement {
-    @apply p-3 relative cursor-pointer text-white w-full font-medium ;
+    @apply p-3 relative cursor-pointer text-white w-full font-medium transition-all duration-300 ease-in-out;
     border-top-left-radius: 30px;
     border-bottom-left-radius: 30px;
-    
 }
 
 .sideElement:hover {
     @apply bg-gray-50;
     color: var(--blue);
-    
 }
 
-
-.sideElement:hover::before,
-.active::before {
+.sideElement::before,
+.sideElement::after {
     content: "";
-    @apply absolute -top-12 right-0 w-12 h-12 z-10 bg-transparent rounded-full; 
+    @apply absolute right-0 w-12 h-12 z-10 bg-transparent rounded-full opacity-0 transition-opacity duration-300 ease-in-out pointer-events-none;
+}
+
+.sideElement::before {
+    @apply -top-12;
     box-shadow: 35px 35px 0 10px var(--gray-50);
 }
 
+.sideElement::after {
+    @apply -bottom-12;
+    box-shadow: 35px -35px 0 10px var(--gray-50);
+}
+
+.sideElement:hover::before,
+.active::before,
 .sideElement:hover::after,
 .active::after {
-    content: "";
-    @apply absolute -bottom-12 right-0 w-12 h-12 z-10 bg-transparent rounded-full; 
-    box-shadow: 35px -35px 0 10px var(--gray-50);
+    @apply opacity-100;
 }
 
 .active {
@@ -41,5 +47,7 @@
 .active-hover {
     background-color: var(--blue);
     color: white ;
+    transition: all 0.3s ease-in-out;
 }
+
 

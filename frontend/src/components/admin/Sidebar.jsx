@@ -5,6 +5,7 @@ import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import TaskAltRoundedIcon from '@mui/icons-material/TaskAltRounded';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import LibraryBooksOutlinedIcon from '@mui/icons-material/LibraryBooksOutlined';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 
 
 import { NavLink } from "react-router-dom"
@@ -28,20 +29,22 @@ export default function Sidebar() {
             {/* <button onClick={() => setOpen(!open)} className="mb-4">
                 ☰
             </button> */}
-            <h1 className="text-4xl text-white font-semibold font-stretch-expanded font-monto mb-8 text-center p-2">SevaSetu</h1>
+            <div className="flex justify-center mb-8 p-4">
+                <img src="/sevasetu logo-bg-removed.svg" alt="SevaSetu" className="h-32 w-auto brightness-0 invert" />
+            </div>
 
             <ul
                 className="space-y-12 w-full absolute"
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}>
+            >
                 <li className="mt-5">
                     <NavLink
-                        to="/"
-                        onMouseEnter={() => setHovered("/")}
+                        to="/admin/"
+                        end
+                        onMouseEnter={() => setHovered("/admin/")}
                         onMouseLeave={() => setHovered(null)}
                         className={({ isActive }) =>
                             `sideElement flex items-center ${isActive
-                                ? hovered && hovered !== "/"
+                                ? hovered && hovered !== "/admin/"
                                     ? "active-hover"
                                     : "active"
                                 : ""
@@ -54,12 +57,12 @@ export default function Sidebar() {
                 </li>
                 <li >
                     <NavLink
-                        to="/volunteers"
-                        onMouseEnter={() => setHovered("/volunteers")}
+                        to="/admin/volunteers"
+                        onMouseEnter={() => setHovered("/admin/volunteers")}
                         onMouseLeave={() => setHovered(null)}
                         className={({ isActive }) =>
                             `sideElement flex items-center ${isActive
-                                ? hovered && hovered !== "/volunteers"
+                                ? hovered && hovered !== "/admin/volunteers"
                                     ? "active-hover"
                                     : "active"
                                 : ""
@@ -72,12 +75,12 @@ export default function Sidebar() {
                 </li>
                 <li >
                     <NavLink
-                        to="/survey"
-                        onMouseEnter={() => setHovered("/survey")}
+                        to="/admin/survey"
+                        onMouseEnter={() => setHovered("/admin/survey")}
                         onMouseLeave={() => setHovered(null)}
                         className={({ isActive }) =>
                             `sideElement flex items-center ${isActive
-                                ? hovered && hovered !== "/survey"
+                                ? hovered && hovered !== "/admin/survey"
                                     ? "active-hover"
                                     : "active"
                                 : ""
@@ -90,12 +93,12 @@ export default function Sidebar() {
                 </li>
                 <li className="mb-5" >
                     <NavLink
-                        to="/task"
-                        onMouseEnter={() => setHovered("/task")}
+                        to="/admin/task"
+                        onMouseEnter={() => setHovered("/admin/task")}
                         onMouseLeave={() => setHovered(null)}
                         className={({ isActive }) =>
                             `sideElement flex items-center ${isActive
-                                ? hovered && hovered !== "/task"
+                                ? hovered && hovered !== "/admin/task"
                                     ? "active-hover"
                                     : "active"
                                 : ""
@@ -104,6 +107,24 @@ export default function Sidebar() {
                     >
                         <TaskAltRoundedIcon className="mr-4" />
                         Tasks
+                    </NavLink>
+                </li>
+                <li className="mb-5">
+                    <NavLink
+                        to="/admin/heatmap"
+                        onMouseEnter={() => setHovered("/admin/heatmap")}
+                        onMouseLeave={() => setHovered(null)}
+                        className={({ isActive }) =>
+                            `sideElement flex items-center ${isActive
+                                ? hovered && hovered !== "/admin/heatmap"
+                                    ? "active-hover"
+                                    : "active"
+                                : ""
+                            }`
+                        }
+                    >
+                        <LocalFireDepartmentIcon className="mr-4" />
+                        Heatmap
                     </NavLink>
                 </li>
 
