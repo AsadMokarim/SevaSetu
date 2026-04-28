@@ -1,246 +1,131 @@
-# 🌉 SevaSetu: Decentralized Disaster & Social Relief Orchestrator
+# 🌉 SevaSetu: AI-Powered Decentralized Relief Orchestrator
 
-**Bridging the gap between ground-level needs and volunteer action through Trust-based Decentralization and AI Matching**
-
-🌐 **Live Demo:** https://sevasetu-1ed86.web.app/
+**"Bridging the gap between ground-level needs and volunteer action through Gemini AI and Trust-based Decentralization."**
 
 ---
 
-## 🚀 The Problem
+## 🌟 The Vision
 
-In disaster and social relief, seconds save lives. Current systems suffer from:
+In disaster and social relief, **seconds save lives**. Traditional centralized systems suffer from administrative bottlenecks, data noise, and delayed response. 
 
-* **Centralized Bottlenecks:** Admin approval delays critical reports
-* **Data Noise:** Difficult to verify truth during chaos
-* **Inefficient Matching:** Volunteers lack a real-time “Digital Dispatcher”
+**SevaSetu** is a self-orchestrating platform that transforms messy real-world data into actionable relief tasks using a sophisticated AI pipeline and a community-driven trust engine.
 
 ---
 
-## ✨ Our Solution: SevaSetu
+## 🧠 Core Intelligence: The Gemini Layer
 
-SevaSetu is a **self-orchestrating platform** that empowers communities to verify data and automates volunteer logistics in real time.
+SevaSetu goes beyond simple data entry. Our **Intelligence Layer** (powered by **Google Gemini-1.5-Flash**) acts as a 24/7 digital dispatcher.
 
----
+### 🔍 Multimodal Intake Pipeline
+1.  **Visual Input**: User uploads a photo of a handwritten note, a situational image, or a paper form.
+2.  **OCR Step**: Hybrid extraction using **Google Vision API** and **Tesseract.js**.
+3.  **Gemini AI Processing**: The raw, messy text is sent to Gemini to:
+    *   **Structure Data**: Extract title, description, location, and volunteer counts.
+    *   **Infer Context**: Determine the type of relief (Food, Medical, etc.) and calculate urgency.
+    *   **Fill Gaps**: Use context-aware reasoning to "guess" missing information reliably.
 
-## 🌟 Key Innovations
-
-### 🛡️ Decentralized Verification
-
-* Reports go live instantly
-* Community-driven verification via **Confidence Score algorithm**
-* Crowd validation replaces admin bottlenecks
-
----
-
-### 📸 Visual AI Intake
-
-* Upload handwritten notes or images
-* OCR pipeline extracts structured needs automatically
-* Supports real-world chaotic input
-
-> ⚠️ *Note: For demo stability, OCR may run in mocked mode if external APIs are not configured. Full pipeline supports Google Vision + Tesseract.*
+### 📊 "Before vs After" Impact
+| Stage | Output Example |
+| :--- | :--- |
+| **Raw Input** | *"urgnt food needed at lajpat ngr near park 20 vols pls"* |
+| **Gemini AI** | `{ "title": "Urgent Food Distribution", "location": "Lajpat Nagar", "vols": 20, "urgency": "high" }` |
+| **Outcome** | **Instant verification and automated volunteer dispatching.** |
 
 ---
 
-### 🤖 Emergency Matching Engine
+## 🛡️ Decentralized Trust System
 
-A weighted algorithm acting as a **24/7 digital dispatcher**:
-
-* **Skill Score (40%)**
-* **Availability (20%)**
-* **Trust Score (20%)**
-* **Proximity (20%)**
-
-🔥 Emergency Mode prioritizes *availability over distance*
+We eliminate the "Admin Bottleneck" by empowering the community:
+*   **Confidence Scoring**: Reports from high-trust volunteers are **auto-verified** and dispatched instantly.
+*   **Crowd Validation**: New reports enter a "Voting Phase" where nearby volunteers verify or flag the report.
+*   **Reputation Engine**: Every action (validating, completing tasks) earns **Performance Points**, creating a self-regulating ecosystem of helpers.
 
 ---
 
-## 🛠️ Tech Stack
+## 🤖 Automated Dispatch (Matching Engine)
 
-### 🎨 Frontend
-
-* React (Vite)
-* Material UI (MUI)
-* Tailwind CSS
-* Leaflet + OpenStreetMap
-
----
-
-### ⚙️ Backend
-
-* Node.js + Express (deployed on Render)
-* REST API architecture
+Our custom **Weighted Matching Algorithm** ensures the right volunteer reaches the right place:
+*   **Skill Match (40%)**: Aligning task requirements with volunteer expertise.
+*   **Proximity (20%)**: Minimizing response time.
+*   **Trust Score (20%)**: Prioritizing reliable responders for critical tasks.
+*   **Availability (20%)**: Preventing volunteer burnout.
 
 ---
 
-### 🔥 Firebase (Core Infrastructure)
+## 🛠️ Technology Stack
 
-* Firestore → real-time database
-* Firebase Auth → authentication
-* Firebase Hosting → frontend deployment
-* Firebase Cloud Messaging (planned)
+### **Frontend**
+*   **React (Vite)** + **Tailwind CSS** (Modern, responsive UI)
+*   **Material UI (MUI)** (Professional component library)
+*   **Leaflet.js** (Real-time crisis mapping and heatmaps)
 
----
+### **Backend**
+*   **Node.js / Express** (Scalable API architecture)
+*   **Google Gemini AI SDK** (Intelligence & Parsing)
+*   **Google Cloud Vision** (Advanced Image OCR)
+*   **Sharp** (Image preprocessing and optimization)
 
-### 🤖 AI & Image Processing
-
-* Google Cloud Vision *(production-ready, optional in demo)*
-* Tesseract.js *(fallback OCR)*
-* Sharp *(image preprocessing)*
-
----
-
-## 📍 Core Features
-
-### 🔍 Smart Visual Intake
-
-* Extracts data from handwritten or image-based reports
-* Auto-enhancement improves OCR accuracy
+### **Infrastructure**
+*   **Firebase Firestore** (Real-time NoSQL database)
+*   **Firebase Auth** (Secure identity management)
+*   **Render** (Production-ready web service hosting)
+*   **Firebase Hosting** (Blazing fast frontend delivery)
 
 ---
 
-### 🛡️ Trust & Reputation System
+## 📍 System Architecture
 
-* Confidence scoring based on history
-* Crowd verification (Verify / Flag)
-* Gamified volunteer performance tracking
-
----
-
-### 🤖 AI Matching Engine
-
-* Intelligent volunteer assignment
-* Prevents overload
-* Optimizes response time
-
----
-
-### 📊 Admin Command Center
-
-* Real-time heatmap of crisis zones
-* Alerts when tasks fail to match volunteers
-
----
-
-## 🌍 Deployment
-
-### 🚀 Frontend
-
-Hosted on **Firebase Hosting**
-
-```bash
-npm run build
-firebase deploy --only hosting
+```mermaid
+graph TD
+    User["👤 User Upload<br/>(Image / Note)"] --> Sharp["🖼️ Preprocessing<br/>(Sharp)"]
+    Sharp --> OCR["🔍 OCR Layer<br/>(Vision/Tesseract)"]
+    OCR --> Gemini["🧠 Gemini AI Layer<br/>(Intelligence)"]
+    Gemini --> Engine["⚙️ Matching Engine<br/>(Dispatch)"]
+    Engine --> DB[("🗄️ Firestore DB")]
+    DB --> Map["🗺️ Real-time Map<br/>(Admin Dashboard)"]
 ```
 
 ---
 
-### ⚙️ Backend
+## 🚀 Getting Started
 
-Hosted on Render as a Web Service
-
-* Root Directory: `backend`
-* Start Command: `npm start`
-
----
-
-### 🔐 Environment Variables (Backend)
-
+### **Environment Setup**
+Create a `.env` file in the `backend` directory:
 ```env
+PORT=5000
+GEMINI_API_KEY=your_key
+FIREBASE_SERVICE_ACCOUNT={your_json_string}
+ADMIN_EMAILS=admin@sevasetu.com
 NODE_ENV=production
-ADMIN_EMAILS=your-email@example.com
-
-# Firebase Admin (JSON as single line)
-FIREBASE_SERVICE_ACCOUNT={your_json_here}
-
-# Google Vision (optional)
-VISION_API_KEY={your_json_here}
 ```
 
----
-
-### 🌐 Frontend Environment
-
-```env
-# Local
-VITE_API_URL=http://localhost:5000/api
-
-# Production
-VITE_API_URL=https://your-backend.onrender.com/api
-```
-
----
-
-## ⚙️ Local Setup
-
-### 📋 Prerequisites
-
-* Node.js (v18+)
-* Firebase account
-* Google Cloud project (optional for OCR)
+### **Installation**
+1.  **Clone the repo**: `git clone https://github.com/AsadMokarim/SevaSetu.git`
+2.  **Install & Run Backend**:
+    ```bash
+    cd backend && npm install && npm start
+    ```
+3.  **Install & Run Frontend**:
+    ```bash
+    cd frontend && npm install && npm run dev
+    ```
 
 ---
 
-### 🧩 Installation
+## 🏆 The Hackathon Edge
 
-```bash
-git clone https://github.com/asadmokarim/SevaSetu.git
-cd SevaSetu
-```
-
----
-
-### Backend
-
-```bash
-cd backend
-npm install
-npm run dev
-```
+SevaSetu isn't just a dashboard; it's a **proactive coordination system**.
+*   **Speed**: Zero-delay reporting via decentralized trust.
+*   **Intelligence**: Gemini AI converts "noise" into "actionable tasks".
+*   **Scale**: Fully serverless-ready architecture.
 
 ---
 
-### Frontend
+## 👥 Our Team
 
-```bash
-cd ../frontend
-npm install
-npm run dev
-```
+*   **Mohammad Asad Mokarim** — Team Lead
+*   **Mohammad Arham**
+*   **Safiullah**
 
 ---
-
-## 📈 Future Roadmap
-
-* 🧠 AI-based crisis prediction
-* 🚚 NGO logistics clustering
-* 🌍 Multi-language OCR support
-* 📱 Offline-first mobile app
-
----
-
-## 🏆 Hackathon Context
-
-SevaSetu solves the **Information Gap in Relief Work** by combining:
-
-* Real-time data flow
-* AI-driven decision making
-* Community-powered verification
-
-👉 Built to demonstrate how scalable, decentralized systems can **save lives in critical moments**
-
----
-
-## 👥 Team
-
-**SevaSetu**
-
-Mohammad Asad Mokarim  - Team Lead
-Mohammad Arham
-Safiullah
-
----
-
-## 📄 License
-
-MIT License
+© 2026 SevaSetu Team | MIT License
