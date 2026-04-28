@@ -1,40 +1,49 @@
 import './index.css'
 import "./App.css"
-import Navbar from "./components/admin/Navbar.jsx"
-import Sidebar from "./components/admin/Sidebar.jsx"
+import { Routes, Route, Navigate } from "react-router-dom"
 
-import { Routes, Route } from "react-router-dom"
-import Dashboard from "./pages/admin/Dashboard/Dashboard.jsx"
-import Volunteers from "./pages/admin/Volunteers/VolunteersPage.jsx"
-import SurveyPage from "./pages/admin/Survey/SurveyPage.jsx"
-import Task from "./pages/admin/Task/Task.jsx"
+import { AuthProvider } from "./contexts/AuthContext"
+import { DEV_MODE } from "./config"
+import ProtectedRoute from "./components/ProtectedRoute"
+import AdminLayout from "./layouts/AdminLayout.jsx"
+import VolunteerLayout from "./layouts/VolunteerLayout.jsx"
 
-
+// Auth pages (public — no login required)
+import AdminLoginPage from "./pages/auth/AdminLoginPage.jsx"
+import VolunteerLoginPage from "./pages/auth/VolunteerLoginPage.jsx"
+import VolunteerSignupPage from "./pages/auth/VolunteerSignupPage.jsx"
 
 function App() {
+  const fallbackRoute = '/volunteer/login';
+
+  console.log("🚀 App loading (Seva Setu) — Real Auth Flow Active");
+
   return (
-    <>
-      <div className="flex">
-        <Sidebar />
+    <AuthProvider>
+      <Routes>
+        {/* ── Public auth routes ─────────────────────────────────────────── */}
+        <Route path="/admin/login"       element={<AdminLoginPage />} />
+        <Route path="/volunteer/login"   element={<VolunteerLoginPage />} />
+        <Route path="/volunteer/signup"  element={<VolunteerSignupPage />} />
 
-        <div className="ml-64 w-full ">
-          <div className="fixed top-0 left-64 right-0 z-1000">
-            <Navbar />
-          </div>
+        {/* ── Protected admin routes ─────────────────────────────────────── */}
+        <Route path="/admin/*" element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminLayout />
+          </ProtectedRoute>
+        } />
 
-          <div className="mt-14 p-4 pl-8 bg-gray-50 min-h-screen">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/volunteers" element={<Volunteers />} />
-              <Route path="/survey" element={<SurveyPage />} />
-              <Route path="/task" element={<Task />} />
-            </Routes>
-          </div>
+        {/* ── Protected volunteer routes ─────────────────────────────────── */}
+        <Route path="/volunteer/*" element={
+          <ProtectedRoute requiredRole="volunteer">
+            <VolunteerLayout />
+          </ProtectedRoute>
+        } />
 
-        </div>
-      </div>
-
-    </>
+        {/* ── Fallback ───────────────────────────────────────────────────── */}
+        <Route path="*" element={<Navigate to={fallbackRoute} replace />} />
+      </Routes>
+    </AuthProvider>
   )
 }
 
